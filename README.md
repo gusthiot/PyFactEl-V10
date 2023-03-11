@@ -1,2 +1,2 @@
 # PyFactEl-V10
-  module de facturation - version 910
+  module de facturation - version 10
