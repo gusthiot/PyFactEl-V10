@@ -9,7 +9,8 @@ class ClasseClient(CsvImport):
     Classe pour l'importation des données de Classes Clients
     """
 
-    cles = ['id_classe', 'code_n', 'intitule', 'ref_fact', 'avantage_HC', 'subsides', 'rabais_excep', 'grille']
+    cles = ['id_classe', 'code_n', 'intitule', 'ref_fact', 'avantage_HC', 'subsides', 'rabais_excep', 'grille',
+            'overhead']
     nom_fichier = "classeclient.csv"
     libelle = "Classes Clients"
 
@@ -40,6 +41,8 @@ class ClasseClient(CsvImport):
             donnee['code_n'], info = Format.est_un_alphanumerique(donnee['code_n'], "le code N", ligne)
             msg += info
             donnee['intitule'], info = Format.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            msg += info
+            donnee['overhead'], info = Format.est_un_entier(donnee['overhead'], "l'overhead", ligne, 0)
             msg += info
             if donnee['ref_fact'] != 'INT' and donnee['ref_fact'] != 'EXT':
                 msg += "le code référence client de la ligne " + str(ligne) + " doit être INT ou EXT\n"

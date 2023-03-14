@@ -31,8 +31,11 @@ class Transactions2New(CsvDict):
                     par_fact = par_code['projets'][icf]
                     id_fact = numeros.couples[code][icf]
                     for id_compte, par_compte in sorted(par_fact['comptes'].items()):
-                        for order, par_order in sorted(par_compte.items()):
-                            for nbr, par_item in sorted(par_order.items()):
+                        for id_classprest, par_classprest in sorted(par_compte.items()):
+                            somme_classe = 0
+                            classprest = imports.classprests.donnees[id_classprest]
+                            base = None
+                            for nbr, par_item in sorted(par_classprest.items()):
                                 for par_user in par_item.values():
                                     if par_user['quantity'] != 0:
                                         ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
@@ -45,14 +48,36 @@ class Transactions2New(CsvDict):
                                             ligne.append(base[self.cles[cle]])
                                         ligne.append(base['user-name'] + " " + base['user-first'][0] + ".")
                                         ligne += [par_user['start'].year, par_user['start'].month, par_user['end'].year,
-                                                  par_user['end'].month]
-                                        for cle in range(21, 28):
+                                                  par_user['end'].month, classprest['id_article']]
+                                        for cle in range(22, 28):
                                             ligne.append(base[self.cles[cle]])
+                                        total_fact = round(2*par_user['total'], 1)/2
                                         ligne += [round(par_user['quantity'], 3), base['item-unit'],
-                                                  base['valuation-price'], round(par_user['deduct'], 2),
-                                                  round(2*par_user['total'], 1)/2]
+                                                  base['valuation-price'], round(par_user['deduct'], 2), total_fact]
                                         self._ajouter_valeur(ligne, i)
+                                        somme_classe += total_fact
                                         i += 1
+                            if somme_classe > 0 and classprest['id_overhead'] != "0":
+                                ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
+                                overhead = imports.overheads.donnees[classprest['id_overhead']]
+                                if base['invoice-project'] == "0":
+                                    ligne.append("GLOB")
+                                else:
+                                    ligne.append("CPTE")
+                                for cle in range(5, 15):
+                                    ligne.append(base[self.cles[cle]])
+                                ligne += [0, "", "", "", "", "", overhead['id_article']]
+                                for cle in range(22, 25):
+                                    ligne.append(base[self.cles[cle]])
+                                ligne += [classprest['id_overhead']]
+                                for cle in range(26, 28):
+                                    ligne.append(base[self.cles[cle]])
+                                classe = imports.classes.donnees[base['client-idclass']]
+                                ligne += [somme_classe, "%", classe['overhead'], 0,
+                                          somme_classe * classe['overhead'] / 100]
+                                self._ajouter_valeur(ligne, i)
+                                i += 1
+
         elif imports.data is not None:
             for donnee in imports.data.donnees:
                 if (imports.edition.annee == donnee['invoice-year'] and

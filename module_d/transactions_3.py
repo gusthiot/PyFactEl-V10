@@ -11,7 +11,7 @@ class Transactions3(CsvDict):
             'client-labelclass', 'oper-id', 'oper-name', 'oper-note', 'staff-note', 'mach-id', 'mach-name',
             'mach-extra', 'user-id', 'user-sciper', 'user-name', 'user-first', 'proj-id', 'proj-nbr', 'proj-name',
             'proj-expl', 'flow-type', 'item-id', 'item-codeK', 'item-textK', 'item-text2K', 'item-nbr', 'item-name',
-            'item-unit', 'item-idsap', 'item-codeD', 'item-flag-usage', 'item-flag-conso', 'item-eligible',
+            'item-unit', 'item-idclass', 'item-codeD', 'item-flag-usage', 'item-flag-conso', 'item-eligible',
             'item-order', 'item-labelcode', 'item-extra', 'platf-code', 'platf-op', 'platf-name', 'transac-date',
             'transac-raw', 'transac-valid', 'transac-id-staff', 'transac-staff', 'transac-quantity', 'transac-usage',
             'transac-runtime', 'transac-runcae', 'valuation-price', 'valuation-brut', 'discount-type', 'discount-CHF',
@@ -40,7 +40,7 @@ class Transactions3(CsvDict):
                 continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
-            id_classe = client['id_classe']
+            id_classe = self.__id_classe(client)
             id_machine = entree['id_machine']
             machine = imports.machines.donnees[id_machine]
             groupe = imports.groupes.donnees[machine['id_groupe']]
@@ -225,7 +225,7 @@ class Transactions3(CsvDict):
                 continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
-            id_classe = client['id_classe']
+            id_classe = self.__id_classe(client)
             id_machine = entree['id_machine']
             machine = imports.machines.donnees[id_machine]
             groupe = imports.groupes.donnees[machine['id_groupe']]
@@ -263,7 +263,7 @@ class Transactions3(CsvDict):
                 continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
-            id_classe = client['id_classe']
+            id_classe = self.__id_classe(client)
             id_prestation = entree['id_prestation']
             prestation = imports.prestations.donnees[id_prestation]
             operateur = imports.users.donnees[entree['id_operateur']]
@@ -306,7 +306,7 @@ class Transactions3(CsvDict):
                 continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
-            id_classe = client['id_classe']
+            id_classe = self.__id_classe(client)
             id_categorie = entree['id_categorie']
             operateur = imports.users.donnees[entree['id_op']]
             rc_map = {'annee': entree['annee'], 'mois': entree['mois'], 'classe': imports.classes.donnees[id_classe],
@@ -378,6 +378,12 @@ class Transactions3(CsvDict):
             quantite = raw
         return [entree['validation'], id_staff, staff, quantite]
 
+    def __id_classe(self, client):
+        plateforme = self.imports.plateforme
+        if plateforme['id_plateforme'] + client['code'] in self.imports.partenaires.donnees.keys():
+            return self.imports.partenaires.donnees[plateforme['id_plateforme'] + client['code']]['id_classe']
+        return client['id_classe']
+
     def __ref_client(self, data, article, date):
         """
         ajout de la référence et des valeurs issues du client
@@ -386,17 +392,17 @@ class Transactions3(CsvDict):
         :param date: date effective
         :return tableau contenant la référence et les valeurs du client
         """
-        id_artsap = article['item-idsap']
-        artsap = self.imports.artsap.donnees[id_artsap]
+        id_classprest = article['item-idclass']
+        classprest = self.imports.classprests.donnees[id_classprest]
         plateforme = self.imports.plateforme
         if (data['classe']['ref_fact'] == 'INT' and data['classe']['avantage_HC'] == 'BONUS' and
-                artsap['eligible'] == 'OUI' and data['compte']['type_subside'] == "0" and plateforme['grille'] != "" and
-                data['classe']['grille'] == 'OUI'):
+                classprest['eligible'] == 'OUI' and data['compte']['type_subside'] == "0" and
+                plateforme['grille'] != "" and data['classe']['grille'] == 'OUI'):
             icf = data['compte']['id_compte']
         else:
             icf = "0"
         return [date.year, date.month, data['annee'], data['mois'], self.imports.version, icf, data['client']['code'],
-                data['client']['code_sap'], data['client']['abrev_labo'], data['client']['id_classe'],
+                data['client']['code_sap'], data['client']['abrev_labo'], data['classe']['id_classe'],
                 data['classe']['code_n'], data['classe']['intitule']]
 
     def __util_proj(self, id_user, compte, flux):
@@ -422,7 +428,7 @@ class Transactions3(CsvDict):
         """
         plateforme = self.imports.plateforme
         return [article['item-id'], code_k, texte_k, texte2_k, article['item-nbr'], article['item-name'],
-                article['item-unit'], article['item-idsap'], article['item-codeD'], article['item-flag-usage'],
+                article['item-unit'], article['item-idclass'], article['item-codeD'], article['item-flag-usage'],
                 article['item-flag-conso'], article['item-eligible'], article['item-order'], article['item-labelcode'],
                 article['item-extra'], article['platf-code'], plateforme['code_p'], plateforme['abrev_plat']]
 
@@ -452,7 +458,7 @@ class Transactions3(CsvDict):
                     result[3] = subside['fin']
                     result[4] = "NO"
                     if validation == "1":
-                        plaf = type_s + article['platf-code'] + article['item-idsap']
+                        plaf = type_s + article['platf-code'] + article['item-idclass']
                         if plaf in self.imports.plafonds.donnees.keys():
                             plafond = self.imports.plafonds.donnees[plaf]
                             result[5] = plafond['pourcentage']
@@ -464,7 +470,7 @@ class Transactions3(CsvDict):
                                         dict_s = self.imports.cles.donnees[type_s]
                                         if self.__check_id_classe(dict_s, id_classe, compte['code_client'], id_machine):
                                             result[4] = "YES"
-                                            cg_id = compte['id_compte'] + article['platf-code'] + article['item-idsap']
+                                            cg_id = compte['id_compte']+article['platf-code']+article['item-idclass']
                                             if cg_id in self.imports.grants.donnees.keys():
                                                 grant = self.imports.grants.donnees[cg_id]['subsid-alrdygrant']
                                             else:
@@ -481,7 +487,7 @@ class Transactions3(CsvDict):
                                             if cg_id not in self.comptabilises.keys():
                                                 self.comptabilises[cg_id] = {'proj-id': compte['id_compte'],
                                                                              'platf-code': article['platf-code'],
-                                                                             'item-idsap': article['item-idsap'],
+                                                                             'item-idclass': article['item-idclass'],
                                                                              'subsid-alrdygrant': mo}
                                             else:
                                                 self.comptabilises[cg_id]['subsid-alrdygrant'] = \

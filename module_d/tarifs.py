@@ -27,7 +27,7 @@ class Tarifs(CsvDict):
 
         for prest in imports.prestations.donnees.values():
             for id_classe in imports.classes.donnees.keys():
-                coefprest = imports.coefprests.donnees[id_classe + prest['id_article']]
+                coefprest = imports.coefprests.donnees[id_classe + prest['id_classe_prest']]
                 prix_unit = round(prest['prix_unit'] * coefprest['coefficient'], 2)
                 donnee = [self.imports.edition.annee, self.imports.edition.mois, prest['id_prestation'], id_classe,
                           prix_unit]

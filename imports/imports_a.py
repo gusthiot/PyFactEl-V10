@@ -83,7 +83,7 @@ class ImportsA(object):
         self.classes = ClasseClient(dossier_fixe, True)
         self.clients = Client(dossier_source, self.facturation, self.classes, True)
         self.plateformes = Plateforme(dossier_fixe, self.clients, self.edition, chemin_grille, True)
-        self.artsap = ArticleSap(dossier_fixe, True)
+        self.artsap = ArticleSap(dossier_fixe)
         self.data = Data(dossier_source, self.clients, self.artsap)
 
         self.plateforme = self.plateformes.donnees[self.edition.plateforme]

@@ -8,7 +8,7 @@ class BilanSubsides(CsvList):
     """
 
     cles = ['invoice-year', 'invoice-month', 'platf-code', 'platf-name', 'client-code', 'client-sap', 'client-name',
-            'client-idclass', 'client-class', 'client-labelclass', 'item-idsap', 'item-codeD', 'item-labelcode',
+            'client-idclass', 'client-class', 'client-labelclass', 'item-idclass', 'item-codeD', 'item-labelcode',
             'valuation-brut', 'valuation-net', 'deduct-CHF', 'subsid-deduct', 'total-fact', 'discount-bonus',
             'subsid-bonus']
 

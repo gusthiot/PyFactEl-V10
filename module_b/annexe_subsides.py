@@ -57,13 +57,14 @@ class AnnexeSubsides(object):
                 compte = imports.comptes.donnees[id_compte]
                 type_s = compte['type_subside']
                 subside = imports.subsides.donnees[type_s]
-                for id_article, artsap in imports.artsap.donnees.items():
-                    plaf = type_s + imports.edition.plateforme + id_article
+                for id_classe, classprest in imports.classprests.donnees.items():
+                    plaf = type_s + imports.edition.plateforme + id_classe
                     if plaf in imports.plafonds.donnees.keys():
                         plafond = imports.plafonds.donnees[plaf]
+                        artsap = imports.artsap.donnees[classprest['id_article']]
                         ligne = [compte['intitule'], artsap['intitule'], subside['intitule'], subside['debut'],
                                  subside['fin'], plafond['pourcentage'], plafond['max_compte'], plafond['max_mois']]
-                        g_id = id_compte + imports.edition.plateforme + id_article
+                        g_id = id_compte + imports.edition.plateforme + id_classe
                         if g_id in imports.grants.donnees.keys():
                             grant, info = Format.est_un_nombre(imports.grants.donnees[g_id]['subsid-alrdygrant'],
                                                                "le montant de grant", mini=0, arrondi=2)
@@ -74,8 +75,8 @@ class AnnexeSubsides(object):
                         subs = 0
                         if code in par_client and id_compte in par_client[code]['comptes']:
                             par_code = par_client[code]['comptes'][id_compte]
-                            if id_article in par_code.keys():
-                                subs = par_code[id_article]['subs']
+                            if id_classe in par_code.keys():
+                                subs = par_code[id_classe]['subs']
 
                         reste = plafond['max_compte'] - grant - subs
                         ligne += [round(grant, 2), round(subs, 2), round(reste, 2)]

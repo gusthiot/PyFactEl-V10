@@ -9,3 +9,6 @@ from .machine import Machine
 from .paramtexte import Paramtexte
 from .plateforme import Plateforme
 from .prestation import Prestation
+from .classe_prestation import ClassePrestation
+from .overhead import Overhead
+

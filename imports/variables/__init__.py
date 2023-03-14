@@ -9,3 +9,4 @@ from .service import Service
 from .subside import Subside
 from .user import User
 from .data import Data
+from .partenaire import Partenaire

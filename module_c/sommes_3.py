@@ -45,13 +45,13 @@ class Sommes3(object):
                 # => annexe details
 
                 nbr = transaction['item-nbr']
-                order = transaction['item-order']
+                id_classe = transaction['item-idclass']
                 if id_compte not in pcp[id_compte_fact]['comptes'].keys():
                     pcp[id_compte_fact]['comptes'][id_compte] = {}
                 pcpc = pcp[id_compte_fact]['comptes'][id_compte]
-                if order not in pcpc.keys():
-                    pcpc[order] = {}
-                pcpa = pcpc[order]
+                if id_classe not in pcpc.keys():
+                    pcpc[id_classe] = {}
+                pcpa = pcpc[id_classe]
                 if nbr not in pcpa.keys():
                     pcpa[nbr] = {}
                 if user_id not in pcpa[nbr].keys():
@@ -67,15 +67,14 @@ class Sommes3(object):
                     pcpa[nbr][user_id]['end'] = transaction['transac-date']
                 # => transactions 2
 
-                id_article = transaction['item-idsap']
                 pcc = self.par_client[code_client]['comptes']
                 if id_compte not in pcc.keys():
                     pcc[id_compte] = {}
                 pccd = pcc[id_compte]
-                if id_article not in pccd.keys():
-                    pccd[id_article] = {'subs': 0}
+                if id_classe not in pccd.keys():
+                    pccd[id_classe] = {'subs': 0}
                 if transaction['subsid-code'] != "" and transaction['subsid-maxproj'] > 0:
-                    pccd[id_article]['subs'] += transaction['subsid-CHF']
+                    pccd[id_classe]['subs'] += transaction['subsid-CHF']
                 # => annexe subsides
 
                 code_d = transaction['item-codeD']

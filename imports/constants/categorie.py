@@ -9,15 +9,15 @@ class Categorie(CsvImport):
     Classe pour l'importation des données de Catégories
     """
 
-    cles = ['id_categorie', 'no_categorie', 'intitule', 'unite', 'id_plateforme', 'id_article']
+    cles = ['id_categorie', 'no_categorie', 'intitule', 'unite', 'id_plateforme', 'id_classe_prest']
     nom_fichier = "categorie.csv"
     libelle = "Catégories"
 
-    def __init__(self, dossier_source, artsap, plateformes):
+    def __init__(self, dossier_source, classprests, plateformes):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
-        :param artsap: articles SAP importés
+        :param classprests: classes prestations importées
         :param plateformes: plateformes importées
         """
         super().__init__(dossier_source)
@@ -38,7 +38,10 @@ class Categorie(CsvImport):
                     msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) +\
                            " n'est pas unique\n"
 
-            msg += self._test_id_coherence(donnee['id_article'], "l'id article SAP", ligne, artsap)
+            msg += self._test_id_coherence(donnee['id_classe_prest'], "l'id classe prestation", ligne, classprests)
+            if classprests.donnees[donnee['id_classe_prest']]['flag_coef'] == "OUI":
+                msg += "le flag coef_prest de l'id classe prestation '" + donnee['id_classe_prest'] + \
+                       "' de la ligne " + str(ligne) + "est à OUI et devrait être à NON\n"
 
             msg += self._test_id_coherence(donnee['id_plateforme'], "l'id plateforme", ligne, plateformes)
 

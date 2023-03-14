@@ -9,16 +9,16 @@ class Prestation(CsvImport):
     Classe pour l'importation des données de Prestations du catalogue
     """
 
-    cles = ['annee', 'mois', 'id_prestation', 'no_prestation', 'designation', 'id_article', 'unite_prest', 'prix_unit',
-            'id_plateforme', 'id_machine']
+    cles = ['annee', 'mois', 'id_prestation', 'no_prestation', 'designation', 'id_classe_prest', 'unite_prest',
+            'prix_unit', 'id_plateforme', 'id_machine']
     nom_fichier = "prestation.csv"
     libelle = "Prestations"
 
-    def __init__(self, dossier_source, artsap, coefprests, plateformes, machines, edition):
+    def __init__(self, dossier_source, classprests, coefprests, plateformes, machines, edition):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
-        :param artsap: articles SAP importés
+        :param classprests: classes prestations importées
         :param coefprests: coefficients prestations importés
         :param plateformes: plateformes importées
         :param machines: machines importées
@@ -62,12 +62,13 @@ class Prestation(CsvImport):
             donnee['unite_prest'], info = Format.est_un_texte(donnee['unite_prest'], "l'unité prestation", ligne, True)
             msg += info
 
-            if donnee['id_article'] == "":
-                msg += "l'id article SAP  de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_article'] not in artsap.donnees.keys():
-                msg += "l'id article SAP de la ligne " + str(ligne) + " n'existe pas dans les codes D\n"
-            elif not coefprests.contient_article(donnee['id_article']):
-                msg += "l'id article SAP' '" + donnee['id_article'] + "' de la ligne " + str(ligne) +\
+            msg += self._test_id_coherence(donnee['id_classe_prest'], "l'id classe prestation", ligne, classprests)
+            if classprests.donnees[donnee['id_classe_prest']]['flag_coef'] == "NON":
+                msg += "le flag coef_prest de l'id classe prestation '" + donnee['id_classe_prest'] + \
+                       "' de la ligne " + str(ligne) + "est à NON et devrait être à OUI\n"
+
+            if not coefprests.contient_classprest(donnee['id_classe_prest']):
+                msg += "l'id classe prestation '" + donnee['id_classe_prest'] + "' de la ligne " + str(ligne) +\
                        " n'est pas référencée dans les coefficients\n"
 
             msg += self._test_id_coherence(donnee['id_plateforme'], "l'id plateforme", ligne, plateformes)

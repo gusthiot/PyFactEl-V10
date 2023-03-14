@@ -9,15 +9,15 @@ class Granted(CsvImport):
     Classe pour l'importation des données de Subsides comptabilisés
     """
 
-    cles = ['proj-id', 'platf-code', 'item-idsap', 'subsid-alrdygrant']
+    cles = ['proj-id', 'platf-code', 'item-idclass', 'subsid-alrdygrant']
     libelle = "Subsides comptabilisés"
 
-    def __init__(self, dossier_source, edition, comptes, artsap, plateformes):
+    def __init__(self, dossier_source, edition, comptes, classprests, plateformes):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param comptes: comptes importés
-        :param artsap: articles SAP importés
+        :param classprests: classes prestations importées
         :param plateformes: plateformes importées
         """
         if edition.mois > 1:
@@ -35,22 +35,23 @@ class Granted(CsvImport):
         for donnee in self.donnees:
             msg += self._test_id_coherence(donnee['proj-id'], "l'id compte", ligne, comptes)
 
-            msg += self._test_id_coherence(donnee['item-idsap'], "l'id article SAP", ligne, artsap)
+            msg += self._test_id_coherence(donnee['item-idclass'], "l'id classe prestation", ligne, classprests)
 
             msg += self._test_id_coherence(donnee['platf-code'], "l'id plateforme", ligne, plateformes)
 
-            triplet = [donnee['proj-id'], donnee['platf-code'], donnee['item-idsap']]
+            triplet = [donnee['proj-id'], donnee['platf-code'], donnee['item-idclass']]
             if triplet not in triplets:
                 triplets.append(triplet)
             else:
                 msg += "Triplet type '" + donnee['type'] + "' id plateforme '" + donnee['platf-code'] + \
-                       "' et id article SAP '" + donnee['item-idsap'] + "' de la ligne " + str(ligne) + " pas unique\n"
+                       "' et id classe prestation '" + donnee['item-idclass'] + "' de la ligne " + str(ligne) + \
+                       " pas unique\n"
 
             donnee['subsid-alrdygrant'], info = Format.est_un_nombre(donnee['subsid-alrdygrant'],
                                                                      "le montant comptabilisé", ligne, 2, 0)
             msg += info
 
-            donnees_dict[donnee['proj-id'] + donnee['platf-code'] + donnee['item-idsap']] = donnee
+            donnees_dict[donnee['proj-id'] + donnee['platf-code'] + donnee['item-idclass']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

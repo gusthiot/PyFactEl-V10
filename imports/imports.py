@@ -9,7 +9,9 @@ from imports.constants import (ArticleSap,
                                Machine,
                                Paramtexte,
                                Plateforme,
-                               Prestation)
+                               Prestation,
+                               ClassePrestation,
+                               Overhead)
 from imports.variables import (Acces,
                                CleSubside,
                                Client,
@@ -19,7 +21,8 @@ from imports.variables import (Acces,
                                PlafSubside,
                                Service,
                                Subside,
-                               User)
+                               User,
+                               Partenaire)
 from imports.construits import (Numero,
                                 Granted,
                                 UserLabo,
@@ -100,18 +103,21 @@ class Imports(object):
         self.classes = ClasseClient(dossier_fixe)
         self.clients = Client(dossier_source, self.facturation, self.classes)
         self.plateformes = Plateforme(dossier_fixe, self.clients, self.edition, chemin_grille)
+        self.partenaires = Partenaire(dossier_fixe, self.clients, self.plateformes, self.classes)
         self.artsap = ArticleSap(dossier_fixe)
-        self.categories = Categorie(dossier_fixe, self.artsap, self.plateformes)
+        self.overheads = Overhead(dossier_fixe, self.artsap)
+        self.classprests = ClassePrestation(dossier_fixe, self.artsap, self.overheads)
+        self.categories = Categorie(dossier_fixe, self.classprests, self.plateformes)
         self.groupes = Groupe(dossier_fixe, self.categories)
         self.machines = Machine(dossier_fixe, self.groupes, self.edition)
         self.subsides = Subside(dossier_source)
-        self.plafonds = PlafSubside(dossier_source, self.subsides, self.artsap, self.plateformes)
+        self.plafonds = PlafSubside(dossier_source, self.subsides, self.classprests, self.plateformes)
         self.cles = CleSubside(dossier_source, self.clients, self.machines, self.classes, self.subsides)
         self.comptes = Compte(dossier_source, self.clients, self.subsides)
         self.users = User(dossier_source)
         self.categprix = CategPrix(dossier_fixe, self.classes, self.categories)
-        self.coefprests = CoefPrest(dossier_fixe, self.classes, self.artsap)
-        self.prestations = Prestation(dossier_fixe, self.artsap, self.coefprests, self.plateformes, self.machines,
+        self.coefprests = CoefPrest(dossier_fixe, self.classes, self.classprests)
+        self.prestations = Prestation(dossier_fixe, self.classprests, self.coefprests, self.plateformes, self.machines,
                                       self.edition)
 
         self.plateforme = self.plateformes.donnees[self.edition.plateforme]
@@ -147,7 +153,7 @@ class Imports(object):
         if not Chemin.existe(self.chemin_precedent, False):
             Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_precedent + " se doit d'être présent !")
 
-        self.grants = Granted(DossierSource(self.chemin_precedent), self.edition, self.comptes, self.artsap,
+        self.grants = Granted(DossierSource(self.chemin_precedent), self.edition, self.comptes, self.classprests,
                               self.plateformes)
         self.userlabs = UserLabo(DossierSource(self.chemin_precedent), self.edition, self.plateformes, self.clients,
                                  self.users)
@@ -190,7 +196,7 @@ class Imports(object):
             dossier_destination = DossierDestination(self.chemin_in)
             for fichier in [self.paramtexte, self.facturation, self.classes, self.plateformes, self.artsap,
                             self.categories, self.groupes, self.machines, self.categprix, self.coefprests,
-                            self.prestations]:
+                            self.prestations, self.classprests, self.overheads]:
                 dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
             if self.logo != "":
                 dossier_destination.ecrire(self.logo, dossier_source.lire(self.logo))
@@ -209,7 +215,7 @@ class Imports(object):
         Chemin.existe(chemin_vin, True)
         dossier_destination = DossierDestination(chemin_vin)
         for fichier in [self.clients, self.subsides, self.plafonds, self.cles, self.comptes, self.users,
-                        self.acces, self.noshows, self.livraisons, self.services]:
+                        self.acces, self.noshows, self.livraisons, self.services, self.partenaires]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
         if self.version > 0:
             for fichier in [self.numeros, self.versions]:
