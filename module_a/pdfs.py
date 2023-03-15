@@ -172,15 +172,20 @@ class Pdfs(object):
                         else:
                             quantite = str(trans['transac-quantity'])
                         subtot += trans['total-fact']
-                        dico.update({'user': trans['user-name-f'], 'start-y': trans['date-start-y'],
-                                     'start-m': Format.mois_string(trans['date-start-m']), 'end-y': trans['date-end-y'],
-                                     'end-m': Format.mois_string(trans['date-end-m']),
+                        start = ""
+                        end = ""
+                        if trans['date-start-m'] != "" and trans['date-start-y'] != "":
+                            start = Format.mois_string(trans['date-start-m']) + "." + str(trans['date-start-y'])
+                        if trans['date-end-m'] != "" and trans['date-end-y'] != "":
+                            end = Format.mois_string(trans['date-end-m']) + "." + str(trans['date-end-y'])
+
+                        dico.update({'user': trans['user-name-f'], 'start': start, 'end': end,
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
-                                     'quant': quantite, 'unit': trans['item-unit'],
+                                     'quant': quantite, 'unit': Latex.echappe_caracteres(trans['item-unit']),
                                      'price': Format.nombre(trans['valuation-price']),
                                      'deduct': Format.nombre(trans['sum-deduct']),
                                      'total': Format.nombre(trans['total-fact'])})
-                        ligne = r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
+                        ligne = r'''\fl{%(user)s} & \fl{%(start)s} & \fl{%(end)s} & 
                                 \fl{%(prest)s} & \fr{%(quant)s} & \fr{%(unit)s} & \fr{%(price)s} & ''' % dico
                         if intype == "GLOB":
                             ligne += r'''\fr{ %(deduct)s} & ''' % dico
@@ -196,6 +201,7 @@ class Pdfs(object):
             lignes.append([r''' \hline
                             \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(sub)s %(article)s}} & \frbs{%(subtot)s}\\
                             \hline ''' % dico, 1])
+
         first_max = 18
         then_max = 25
         contenu = titres

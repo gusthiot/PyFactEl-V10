@@ -60,21 +60,18 @@ class Transactions2New(CsvDict):
                             if somme_classe > 0 and classprest['id_overhead'] != "0":
                                 ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
                                 overhead = imports.overheads.donnees[classprest['id_overhead']]
+                                artsap = imports.artsap.donnees[overhead['id_article']]
+                                classe = imports.classes.donnees[base['client-idclass']]
                                 if base['invoice-project'] == "0":
                                     ligne.append("GLOB")
                                 else:
                                     ligne.append("CPTE")
                                 for cle in range(5, 15):
                                     ligne.append(base[self.cles[cle]])
-                                ligne += [0, "", "", "", "", "", overhead['id_article']]
-                                for cle in range(22, 25):
-                                    ligne.append(base[self.cles[cle]])
-                                ligne += [classprest['id_overhead']]
-                                for cle in range(26, 28):
-                                    ligne.append(base[self.cles[cle]])
-                                classe = imports.classes.donnees[base['client-idclass']]
-                                ligne += [somme_classe, "%", classe['overhead'], 0,
-                                          somme_classe * classe['overhead'] / 100]
+                                ligne += [0, "", "", "", "", "", overhead['id_article'], artsap['code_d'],
+                                          artsap['ordre'], artsap['intitule'], classprest['id_overhead'],
+                                          overhead['no_overhead'], overhead['intitule'], somme_classe, "%",
+                                          classe['overhead'], 0, somme_classe * classe['overhead'] / 100]
                                 self._ajouter_valeur(ligne, i)
                                 i += 1
 

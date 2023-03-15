@@ -13,10 +13,14 @@ class Format(object):
         :param mois: mois formaté en nombre
         :return: mois formaté en string
         """
-        if mois < 10:
-            return "0" + str(mois)
-        else:
-            return str(mois)
+        try:
+            mint = int(mois)
+            if mint < 10:
+                return "0" + str(mint)
+            else:
+                return str(mint)
+        except ValueError:
+            return "mois pas un entier"
 
     @staticmethod
     def nombre(nombre):
