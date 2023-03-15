@@ -57,23 +57,24 @@ class Transactions2New(CsvDict):
                                         self._ajouter_valeur(ligne, i)
                                         somme_classe += total_fact
                                         i += 1
-                            if somme_classe > 0 and classprest['id_overhead'] != "0":
-                                ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
-                                overhead = imports.overheads.donnees[classprest['id_overhead']]
-                                artsap = imports.artsap.donnees[overhead['id_article']]
+                            if somme_classe > 0 and classprest['id_overhead'] != "0" and base is not None:
                                 classe = imports.classes.donnees[base['client-idclass']]
-                                if base['invoice-project'] == "0":
-                                    ligne.append("GLOB")
-                                else:
-                                    ligne.append("CPTE")
-                                for cle in range(5, 15):
-                                    ligne.append(base[self.cles[cle]])
-                                ligne += [0, "", "", "", "", "", overhead['id_article'], artsap['code_d'],
-                                          artsap['ordre'], artsap['intitule'], classprest['id_overhead'],
-                                          overhead['no_overhead'], overhead['intitule'], somme_classe, "%",
-                                          classe['overhead'], 0, somme_classe * classe['overhead'] / 100]
-                                self._ajouter_valeur(ligne, i)
-                                i += 1
+                                if classe['overhead'] > 0:
+                                    ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
+                                    overhead = imports.overheads.donnees[classprest['id_overhead']]
+                                    artsap = imports.artsap.donnees[overhead['id_article']]
+                                    if base['invoice-project'] == "0":
+                                        ligne.append("GLOB")
+                                    else:
+                                        ligne.append("CPTE")
+                                    for cle in range(5, 15):
+                                        ligne.append(base[self.cles[cle]])
+                                    ligne += [0, "", "", "", "", "", overhead['id_article'], artsap['code_d'],
+                                              artsap['ordre'], artsap['intitule'], classprest['id_overhead'],
+                                              overhead['no_overhead'], overhead['intitule'], round(somme_classe, 2), "%",
+                                              classe['overhead'], 0, round(2*somme_classe * classe['overhead'] / 100, 1)/2]
+                                    self._ajouter_valeur(ligne, i)
+                                    i += 1
 
         elif imports.data is not None:
             for donnee in imports.data.donnees:

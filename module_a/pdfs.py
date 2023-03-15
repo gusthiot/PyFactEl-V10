@@ -155,22 +155,25 @@ class Pdfs(object):
 
         tot = 0
         lignes = []
-        for id_article, par_article in par_compte['articles'].items():
+        for id_article, par_article in sorted(par_compte['articles'].items()):
             article = self.imports.artsap.donnees[id_article]
             subtot = 0
             for par_item in par_article['items'].values():
                 for par_user in par_item.values():
                     for key in par_user:
                         trans = self.transactions.valeurs[key]
-                        qqq = 1000 * trans['transac-quantity']
-                        if qqq % 1000 == 0:
-                            quantite = str(int(trans['transac-quantity'])) + r'''\hphantom{.000}'''
-                        elif qqq % 100 == 0:
-                            quantite = str(trans['transac-quantity']) + r'''\hphantom{00}'''
-                        elif qqq % 10 == 0:
-                            quantite = str(trans['transac-quantity']) + r'''\hphantom{0}'''
+                        if id_article == "sap05":
+                            quantite = Format.nombre(trans['transac-quantity'])
                         else:
-                            quantite = str(trans['transac-quantity'])
+                            qqq = 1000 * trans['transac-quantity']
+                            if qqq % 1000 == 0:
+                                quantite = str(int(trans['transac-quantity'])) + r'''\hphantom{.000}'''
+                            elif qqq % 100 == 0:
+                                quantite = str(trans['transac-quantity']) + r'''\hphantom{00}'''
+                            elif qqq % 10 == 0:
+                                quantite = str(trans['transac-quantity']) + r'''\hphantom{0}'''
+                            else:
+                                quantite = str(trans['transac-quantity'])
                         subtot += trans['total-fact']
                         start = ""
                         end = ""
