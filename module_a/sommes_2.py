@@ -55,9 +55,9 @@ class Sommes2(object):
             if trans['item-idsap'] not in tpa:
                 tpa[trans['item-idsap']] = {'items': {}}
             tps = tpa[trans['item-idsap']]['items']
-            if trans['item-id'] not in tps:
-                tps[trans['item-id']] = {}
-            tpsi = tps[trans['item-id']]
+            if trans['item-nbr'] not in tps:
+                tps[trans['item-nbr']] = {}
+            tpsi = tps[trans['item-nbr']]
             if trans['user-id'] not in tpsi:
                 tpsi[trans['user-id']] = []
             tpsi[trans['user-id']].append(key)

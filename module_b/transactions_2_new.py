@@ -69,7 +69,7 @@ class Transactions2New(CsvDict):
                                         ligne.append("CPTE")
                                     for cle in range(5, 15):
                                         ligne.append(base[self.cles[cle]])
-                                    ligne += [0, "", "", "", "", "", overhead['id_article'], artsap['code_d'],
+                                    ligne += ["0", "", "", "", "", "", overhead['id_article'], artsap['code_d'],
                                               artsap['ordre'], artsap['intitule'], classprest['id_overhead'],
                                               overhead['no_overhead'], overhead['intitule'], round(somme_classe, 2), "%",
                                               classe['overhead'], 0, round(2*somme_classe * classe['overhead'] / 100, 1)/2]

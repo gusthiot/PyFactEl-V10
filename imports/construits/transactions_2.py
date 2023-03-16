@@ -59,16 +59,21 @@ class Transactions2(CsvImport):
             msg += info
             donnee['item-id'], info = Format.est_un_alphanumerique(donnee['item-id'], "l'id item", ligne)
             msg += info
-            donnee['date-start-m'], info = Format.est_un_entier(donnee['date-start-m'], "le mois de départ", ligne, 1,
-                                                                12)
-            msg += info
-            donnee['date-start-y'], info = Format.est_un_entier(donnee['date-start-y'], "l'annee de départ", ligne,
-                                                                2000, 2099)
-            msg += info
-            donnee['date-end-m'], info = Format.est_un_entier(donnee['date-end-m'], "le mois de fin", ligne, 1, 12)
-            msg += info
-            donnee['date-end-y'], info = Format.est_un_entier(donnee['date-end-y'], "l'annee de fin", ligne, 2000, 2099)
-            msg += info
+            if donnee['date-start-m'] != "":
+                donnee['date-start-m'], info = Format.est_un_entier(donnee['date-start-m'], "le mois de départ", ligne,
+                                                                    1, 12)
+                msg += info
+            if donnee['date-start-y'] != "":
+                donnee['date-start-y'], info = Format.est_un_entier(donnee['date-start-y'], "l'annee de départ", ligne,
+                                                                    2000, 2099)
+                msg += info
+            if donnee['date-end-m'] != "":
+                donnee['date-end-m'], info = Format.est_un_entier(donnee['date-end-m'], "le mois de fin", ligne, 1, 12)
+                msg += info
+            if donnee['date-end-y'] != "":
+                donnee['date-end-y'], info = Format.est_un_entier(donnee['date-end-y'], "l'annee de fin", ligne, 2000,
+                                                                  2099)
+                msg += info
             donnee['total-fact'], info = Format.est_un_nombre(donnee['total-fact'], "le montant total", ligne, 2, 0)
             msg += info
             if donnee['invoice-id'] not in ids:
