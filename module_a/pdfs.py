@@ -158,7 +158,7 @@ class Pdfs(object):
         for id_article, par_article in sorted(par_compte['articles'].items()):
             article = self.imports.artsap.donnees[id_article]
             subtot = 0
-            for par_item in par_article['items'].values():
+            for item, par_item in sorted(par_article['items'].items()):
                 for par_user in par_item.values():
                     for key in par_user:
                         trans = self.transactions.valeurs[key]

@@ -35,7 +35,7 @@ class Transactions2New(CsvDict):
                             somme_classe = 0
                             classprest = imports.classprests.donnees[id_classprest]
                             base = None
-                            for nbr, par_item in sorted(par_classprest.items()):
+                            for nbr, par_item in par_classprest.items():
                                 for par_user in par_item.values():
                                     if par_user['quantity'] != 0:
                                         ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
